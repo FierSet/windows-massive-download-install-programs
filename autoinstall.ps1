@@ -43,7 +43,7 @@ function downloadprogram($name, $url){
             $responseStream = $dowunload.RawContentStream #get response stream
 
             $fileStream = [System.IO.File]::Open($finalPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write) #create file stream
-            $responseStream.CopyTo($fileStream) #copy response stream to file stream
+            $r0esponseStream.CopyTo($fileStream) #copy response stream to file stream
 
             Write-Host "Downloading: $name$extension Success." -ForegroundColor Green
 

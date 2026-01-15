@@ -7,6 +7,10 @@ Contents
 - `install.bat` — Batch helper to run installers (Windows).
 - `programs/` — Directory containing program installers or helper manifests.
 
+## Architecture
+
+![Diagram](https://raw.githubusercontent.com/FierSet/windows-massive-download-install-programs/refs/heads/main/diagram.png)
+
 Prerequisites
 - Windows 10/11 (or later)
 - Administrative privileges
