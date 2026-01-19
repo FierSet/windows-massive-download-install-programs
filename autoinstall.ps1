@@ -88,13 +88,13 @@ function downloadprogram($name, $url){
 
 function install_program ($program, $name){
 
-    if($name -match '.msi'){
+    if($name -match '.msi'){ #msi installation
         $job = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$program`" /qn /norestart" -PassThru -Verb RunAs #-Wait
     }
-    elseif($ARGUMENTS.ContainsKey($name)){
+    elseif($ARGUMENTS.ContainsKey($name)){ #exe installation with arguments
         $job = Start-Process -FilePath $program -ArgumentList $ARGUMENTS[$name] -PassThru -Verb RunAs #-Wait
     }
-    else{
+    else{ #exe installation without arguments
         $job = Start-Process -FilePath $program -PassThru -Verb RunAs #-Wait
     }
 
