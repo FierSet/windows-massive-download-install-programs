@@ -4,7 +4,6 @@ $programsPath = "$selfPath\programs"
 
 $log = "$selfPath\autoinstall.log" #log file path
 
-
 function LogMessage([string]$message, [string]$level = "INFO"){  # INFO, WARNING, ERROR
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $logEntry = "[$timestamp] [$level] $message"
@@ -40,7 +39,7 @@ $downloadsPath = @{ #program name and download url
     "dotnet" = "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.102/dotnet-sdk-10.0.102-win-x64.exe"
 }
 
-$ARGUMENTS = @{ #silent install arguments
+$ARGUMENTS = @{ #silent install arguments only exe files
     "firefox.exe" = "/S"
     "steam.exe" = "/S"
     "brave.exe" = "/silent /install"
@@ -61,7 +60,7 @@ function downloadprogram($name, $url){
     {
         $dowunload = Invoke-WebRequest -Uri $url -UseBasicParsing #download file
 
-        if($dowunload.StatusCode -eq 200)
+        if($dowunload.StatusCode -eq 200) #check if download was successful
         {
             $urlFinal = $dowunload.BaseResponse.ResponseUri.AbsoluteUri #get final url after redirections
 
