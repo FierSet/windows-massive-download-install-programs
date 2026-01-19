@@ -28,6 +28,7 @@ if (!(Test-Path -Path $programsPath)) { #check if programs directory exists
 
 
 $downloadsPath = @{ #program name and download url
+    "java-jdk" = "https://download.oracle.com/java/25/latest/jdk-25_windows-x64_bin.exe"
     "firefox" = "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US"
     "steam" = "https://steamcdn-a.akamaihd.net/client/installer/SteamSetup.exe"
     "winrar" = "https://www.rarlab.com/rar/winrar-x64-602.exe"
@@ -49,6 +50,7 @@ $ARGUMENTS = @{ #silent install arguments
     "git.exe" = "/VERYSILENT /NORESTART /NOCANCEL /SP /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS=`"icons,ext\reg\shellhere,assoc,assoc_sh`""
     "discord.exe" = "/S"
     "dotnet.exe" = "/install /quiet /norestart"
+    "java-jdk.exe" = "/s INSTALLDIR=C:\Progra~1\Java\jdk"
 }
 
 function downloadprogram($name, $url){
