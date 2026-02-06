@@ -1,0 +1,13 @@
+Name,Install,URL,Parameters
+firefox,x,https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US,/S
+steam,x,https://steamcdn-a.akamaihd.net/client/installer/SteamSetup.exe,/S /D=C:\Program Files (x86)\Steam
+brave,x,https://laptop-updates.brave.com/latest/win64/BraveSetup.exe,/silent /install
+winrar,x,https://www.rarlab.com/rar/winrar-x64-602.exe,/S
+visualstudiocode,x,https://update.code.visualstudio.com/latest/win32-x64-user/stable.exe,/VERYSILENT /NORESTART /MERGETASKS=!runcode
+Rainmeter,x,https://github.com/rainmeter/rainmeter/releases/download/v4.5.23.3836/Rainmeter-4.5.23.exe,/S
+git,x,https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe,/VERYSILENT /NORESTART /NOCANCEL /SP /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS
+discord,x,https://discord.com/api/download?platform=win&filename=DiscordSetup.exe,/S
+dotnet,x,https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.102/dotnet-sdk-10.0.102-win-x64.exe,/install /quiet /norestart
+java-jdk,x,https://download.oracle.com/java/25/latest/jdk-25_windows-x64_bin.exe,"INSTALLDIR=""C:\Program Files\Java\jdk-25"" /s /L en"
+chrome_installer,x,https://dl.google.com/chrome/install/latest/chrome_installer.exe,/silent /install
+7zip,x,https://www.7-zip.org/a/7z2501-x64.msi,

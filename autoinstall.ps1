@@ -1,55 +1,43 @@
-$selfPath = Split-Path -Parent $PSCommandPath
+$selfPath = Split-Path -Parent $PSCommandPath #get script directory path
 
-$programsPath = "$selfPath\programs"
+$programsPath = "$selfPath\programs" #programs directory path
 
 $log = "$selfPath\autoinstall.log" #log file path
 
+$csvPath = "$selfPath\programlist.csv" #csv file path
+
+$ARGUMENTS = @{} #silent install arguments only exe files, the exe only use arguments if exists in this hashtable
+
+if(-not (Test-Path $csvPath)) #check if csv file exists
+{
+    Write-Host "Failed to read CSV file at $csvPath or is empty. A csv file was created on $selfPath. please edit it with your programs list." -ForegroundColor Red
+    "Name,Install,URL,Parameters" | Out-File -FilePath $csvPath -Encoding UTF8
+    exit 1
+}
+
+$programsData = Import-Csv -Path $csvPath #import csv data
+
+if($programsData.Count -eq 0) #check if csv file is empty
+{
+    Write-Host "CSV file at $csvPath is empty. Please edit it with your programs list." -ForegroundColor Red
+    exit 1
+}
+
 function LogMessage([string]$message, [string]$level = "INFO"){  # INFO, WARNING, ERROR
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$timestamp] [$level] $message"
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss" #get current timestamp
+    $logEntry = "[$timestamp] [$level] $message" #format log entry
     
-    # Write to console
-    #Write-Host $logEntry
-    
-    # Write to log file
-    Add-Content -Path $log -Value $logEntry
+    Add-Content -Path $log -Value $logEntry #append log entry to log file
 }
 
 if(!(Test-Path -Path $log)){ #check if log file exists
     New-Item -ItemType File -Path $log | Out-Null #create log file
-    LogMessage "Log file created at $log"
+    LogMessage "Log file created at $log" #log file creation message
 }
 
 if (!(Test-Path -Path $programsPath)) { #check if programs directory exists
     New-Item -ItemType Directory -Path $programsPath | Out-Null #create programs directory
-    LogMessage "Created programs directory at $programsPath"
-}
-
-
-$downloadsPath = @{ #program name and download url
-    "java-jdk" = "https://download.oracle.com/java/25/latest/jdk-25_windows-x64_bin.exe"
-    "firefox" = "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US"
-    "steam" = "https://steamcdn-a.akamaihd.net/client/installer/SteamSetup.exe"
-    "winrar" = "https://www.rarlab.com/rar/winrar-x64-602.exe"
-    "visualstudiocode" = "https://update.code.visualstudio.com/latest/win32-x64-user/stable"
-    "Rainmeter" = "https://github.com/rainmeter/rainmeter/releases/download/v4.5.23.3836/Rainmeter-4.5.23.exe"
-    "git" = "https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe"
-    "brave" = "https://laptop-updates.brave.com/latest/win64"
-    "discord" = "https://discord.com/api/download?platform=win"
-    "dotnet" = "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.102/dotnet-sdk-10.0.102-win-x64.exe"
-}
-
-$ARGUMENTS = @{ #silent install arguments only exe files
-    "firefox.exe" = "/S"
-    "steam.exe" = "/S"
-    "brave.exe" = "/silent /install"
-    "winrar.exe" = "/S"
-    "visualstudiocode.exe" = "/VERYSILENT /NORESTART /MERGETASKS=`"!runcode`""
-    "Rainmeter.exe" = "/S"
-    "git.exe" = "/VERYSILENT /NORESTART /NOCANCEL /SP /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS=`"icons,ext\reg\shellhere,assoc,assoc_sh`""
-    "discord.exe" = "/S"
-    "dotnet.exe" = "/install /quiet /norestart"
-    "java-jdk.exe" = "/s INSTALLDIR=C:\Progra~1\Java\jdk"
+    LogMessage "Created programs directory at $programsPath" #
 }
 
 function downloadprogram($name, $url){
@@ -73,6 +61,8 @@ function downloadprogram($name, $url){
 
             Write-Host "Downloading: $name$extension Success." -ForegroundColor Green
             LogMessage "Downloaded: $name$extension from $urlFinal"
+            $fileStream.Close(); $responseStream.Close()
+            return $extension #return extension
         }else{
             Write-Host "Downloading: $name Fatal Error: no downloaded." -ForegroundColor Red
             LogMessage "Failed to download: $name from $url. Status Code: $($dowunload.StatusCode)" "ERROR"
@@ -82,7 +72,6 @@ function downloadprogram($name, $url){
         Write-Host "Downloading: $name Fatal Error: no downloaded: $($_.Exception.Message)" -ForegroundColor Red
         LogMessage "Failed to download: $name from $url. Error: $($_.Exception.Message)" "ERROR"
     }
-    finally { $fileStream.Close(); $responseStream.Close()<#  #close streams  #>} 
 
 }
 
@@ -98,7 +87,7 @@ function install_program ($program, $name){
         $job = Start-Process -FilePath $program -PassThru -Verb RunAs #-Wait
     }
 
-    $job.WaitForExit()
+    $job.WaitForExit() #wait for installation to finish
 
     if($job.ExitCode -eq 0){
         Write-Host "Installing: $name Success." -ForegroundColor Green
@@ -110,55 +99,82 @@ function install_program ($program, $name){
         Write-Host "Installing: $name Fatal Error: no installed." -ForegroundColor Red
         LogMessage "Failed to install: $name" "ERROR"
     }
-
     
 }
 
-LogMessage "Starting download process____________________________________"
-## Downloading Section
+function stardownloadfromcsv {
 
+    $current_file_nom = 0
+    $nomfiles = $programsData.Count
+    $extension = ".exe"
+
+    # Build hashtables from CSV data
+    foreach ($program in $programsData) 
+    {   
+        if($program.Install -ne "")
+        {
+            $programName = $program.Name
+            $url = $program.URL
+
+            $percentComplete = ($current_file_nom / $nomfiles) * 100
+
+            Write-Progress -Activity "Processing..." -Status "$percentComplete% Complete" -PercentComplete $percentComplete
+
+            #check if file already exists
+            if(Test-Path "$programsPath\$programName.exe"){$extension = ".exe"} 
+            elseif (Test-Path "$programsPath\$programName.msi") {$extension = ".msi"}
+            else {$extension = downloadprogram $programName $url}
+            
+            if($extension -eq ".exe" -and $program.Parameters -ne ""){
+                $ARGUMENTS["$programName$extension"] = $program.Parameters
+            }
+
+            $current_file_nom++
+        }
+    }
+}
+
+function startinstallfromcsv 
+{
+    $current_file_nom = 0
+
+    $nomfiles = (Get-ChildItem -Path ($programsPath) -File).Count
+
+    Get-ChildItem -Path ($programsPath) | ForEach-Object {
+        
+        Write-Output "Installing: $($_.Name)."
+
+        $percentComplete = ($current_file_nom / $nomfiles) * 100
+
+        Write-Progress -Activity "Processing..." -Status "$percentComplete% Complete" -PercentComplete $percentComplete
+
+        install_program $_.FullName $_.Name
+
+        $current_file_nom++
+    }
+
+    if($nomfiles -eq 0)
+    {
+        Write-Host "No programs to install. Please check the programs directory at $programsPath or the CSV file at $csvPath." -ForegroundColor Yellow
+        LogMessage "No programs to install. Programs directory is empty." "WARNING"
+    }
+}
+
+LogMessage "Starting download process____________________________________"
+
+## Downloading Section
 Write-Output "Downloading programs."
 Write-Output "`n"#"Script location: $selfPath"
 
-$current_file_nom = 0
-
-$nomfiles = $downloadsPath.Count
-
-foreach ($key in $downloadsPath.Keys) { #loop through hashtable keys
-
-
-    $percentComplete = ($current_file_nom / $nomfiles) * 100
-
-    Write-Progress -Activity "Processing..." -Status "$percentComplete% Complete" -PercentComplete $percentComplete
-
-    downloadprogram $key $downloadsPath[$key]
-
-    $current_file_nom++
-
-}
+stardownloadfromcsv
 
 ## Installation Section
-
 LogMessage "Starting installation process____________________________________"
 
 Write-Output "Installing programs."
 Write-Output "`n"#"Script location: $selfPath"
 
-$current_file_nom = 0
+startinstallfromcsv
 
-$nomfiles = (Get-ChildItem -Path ($programsPath) -File).Count
 
-Get-ChildItem -Path ($programsPath) | ForEach-Object {
-    
-    Write-Output "Installing: $($_.Name)."
-
-    $percentComplete = ($current_file_nom / $nomfiles) * 100
-
-    Write-Progress -Activity "Processing..." -Status "$percentComplete% Complete" -PercentComplete $percentComplete
-
-    install_program $_.FullName $_.Name
-
-    $current_file_nom++
-}
-
-Write-Output "Process completed."
+Write-Output "Process completed. you can check the log file at $log for more details."
