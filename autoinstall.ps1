@@ -62,7 +62,7 @@ function downloadprogram($name, $url){
             Write-Host "Downloading: $name$extension Success." -ForegroundColor Green
             LogMessage "Downloaded: $name$extension from $urlFinal"
             $fileStream.Close(); $responseStream.Close()
-            return $extension #return extension
+            return "$name$extension" #return extension
         }else{
             Write-Host "Downloading: $name Fatal Error: no downloaded." -ForegroundColor Red
             LogMessage "Failed to download: $name from $url. Status Code: $($dowunload.StatusCode)" "ERROR"
@@ -106,7 +106,7 @@ function stardownloadfromcsv {
 
     $current_file_nom = 0
     $nomfiles = $programsData.Count
-    $extension = ".exe"
+    $namewithextension = ".exe"
 
     # Build hashtables from CSV data
     foreach ($program in $programsData) 
@@ -115,19 +115,18 @@ function stardownloadfromcsv {
         {
             $programName = $program.Name
             $url = $program.URL
+            $paragmeters = $program.Parameters
 
             $percentComplete = ($current_file_nom / $nomfiles) * 100
 
             Write-Progress -Activity "Processing..." -Status "$percentComplete% Complete" -PercentComplete $percentComplete
 
             #check if file already exists
-            if(Test-Path "$programsPath\$programName.exe"){$extension = ".exe"} 
-            elseif (Test-Path "$programsPath\$programName.msi") {$extension = ".msi"}
-            else {$extension = downloadprogram $programName $url}
+            if(Test-Path "$programsPath\$programName.exe"){$namewithextension = ".exe"} 
+            elseif (Test-Path "$programsPath\$programName.msi") {$namewithextension = ".msi"}
+            else {$namewithextension = downloadprogram $programName $url}
             
-            if($extension -eq ".exe" -and $program.Parameters -ne ""){
-                $ARGUMENTS["$programName$extension"] = $program.Parameters
-            }
+            if($namewithextension -match '.exe' -and $program.Parameters -ne ""){ $ARGUMENTS["$programName.exe"] = $paragmeters }
 
             $current_file_nom++
         }
@@ -164,7 +163,15 @@ LogMessage "Starting download process____________________________________"
 
 ## Downloading Section
 Write-Output "Downloading programs."
-Write-Output "`n"#"Script location: $selfPath"
+Write-Output "`n"
+Write-Output "`n"
+Write-Output "`n"
+Write-Output "`n"
+Write-Output "================================================================"
+Write-Output "`n"
+Write-Output "`n"
+Write-Output "`n"
+Write-Output "`n"
 
 stardownloadfromcsv
 

@@ -11,5 +11,5 @@ dotnet,x,https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.102/dotnet-sdk-10.0
 java-jdk,x,https://download.oracle.com/java/25/latest/jdk-25_windows-x64_bin.exe,"INSTALLDIR=""C:\Program Files\Java\jdk-25"" /s /L en"
 chrome_installer,x,https://dl.google.com/chrome/install/latest/chrome_installer.exe,/silent /install
 7zip,x,https://www.7-zip.org/a/7z2501-x64.msi,
-Visualstudio2026,x,https://visualstudio.microsoft.com/es/thank-you-downloading-visual-studio/?sku=Community&channel=Stable&version=VS18&source=VSLandingPage&passive=false&cid=2500#,--installPath C:\VS2026Community --add Microsoft.VisualStudio.Workload.CoreEditor --add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --quiet --wait
+Visualstudio2026,x,https://aka.ms/vs/stable/vs_enterprise.exe,"--quiet --wait"
 SQLSERVER,x,https://go.microsoft.com/fwlink/p/?linkid=2216019&clcid=0x409&culture=en-us&country=us,"/Q /ACTION=Install /FEATURES=SQLEngine,Replication /INSTANCENAME=MSSQLSERVER /SQLSVCACCOUNT='NT AUTHORITY\Network Service' /SQLSVCPASSWORD='' /SQLSYSADMINACCOUNTS='BUILTIN\Administrators' /IACCEPTSQLSERVERLICENSETERMS"
