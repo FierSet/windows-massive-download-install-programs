@@ -14,6 +14,7 @@ if(-not (Test-Path $csvPath)) #check if csv file exists
     "Name,Install,URL,Parameters" | Out-File -FilePath $csvPath -Encoding UTF8
     exit 1
 }
+else{ Clear-Content -Path $log -ErrorAction SilentlyContinue } #clear log file if exists
 
 $programsData = Import-Csv -Path $csvPath #import csv data
 
@@ -72,7 +73,6 @@ function downloadprogram($name, $url){
         Write-Host "Downloading: $name Fatal Error: no downloaded: $($_.Exception.Message)" -ForegroundColor Red
         LogMessage "Failed to download: $name from $url. Error: $($_.Exception.Message)" "ERROR"
     }
-
 }
 
 function install_program ($program, $name){
@@ -98,8 +98,7 @@ function install_program ($program, $name){
     }else{
         Write-Host "Installing: $name Fatal Error: no installed." -ForegroundColor Red
         LogMessage "Failed to install: $name" "ERROR"
-    }
-    
+    }  
 }
 
 function stardownloadfromcsv {
@@ -158,6 +157,8 @@ function startinstallfromcsv
         LogMessage "No programs to install. Programs directory is empty." "WARNING"
     }
 }
+
+LogMessage "Script started. CSV file read successfully with $($programsData.Count) entries." #log script start and csv read success
 
 LogMessage "Starting download process____________________________________"
 
