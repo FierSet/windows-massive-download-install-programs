@@ -8,7 +8,7 @@ $csvPath = "$selfPath\programlist.csv" #csv file path
 
 $ARGUMENTS = @{} #silent install arguments only exe files, the exe only use arguments if exists in this hashtable
 
-if(-not (Test-Path $csvPath)) #check if csv file exists
+if(-not (Test-Path $csvPath)) #check if csv file exists if not create it with headers and exit
 {
     Write-Host "Failed to read CSV file at $csvPath or is empty. A csv file was created on $selfPath. please edit it with your programs list." -ForegroundColor Red
     "Name,Install,URL,Parameters" | Out-File -FilePath $csvPath -Encoding UTF8
@@ -41,7 +41,7 @@ if (!(Test-Path -Path $programsPath)) { #check if programs directory exists
     LogMessage "Created programs directory at $programsPath" #
 }
 
-function downloadprogram($name, $url){
+function downloadprogram($name, $url){ #download program from url and return the name with extension
 
     Write-Output "Downloading: $name from $url"
 
@@ -184,5 +184,5 @@ Write-Output "`n"#"Script location: $selfPath"
 
 startinstallfromcsv
 
-
+Write-Output "Developed by: Eng. Miguel Angel Ortega Zacarias @FierSet" -ForegroundColor Cyan
 Write-Output "Process completed. you can check the log file at $log for more details."
