@@ -2,6 +2,8 @@
 
 set selflocation=%~dp0
 
-powershell -NoProfile -ExecutionPolicy Bypass -File %selflocation%/autoinstall.ps1
+set scriptdir=autoinstall.ps1
+
+powershell -NoProfile -ExecutionPolicy Bypass -File %selflocation%/%scriptdir%
 
 pause
